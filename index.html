@@ -3,11 +3,134 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CELEH 2026 - Control de Acceso</title>
+
+  <title>CELEH 2026 | Control de Acceso</title>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #101820;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 25px;
+    }
+
+    h1 {
+      color: #d4af37;
+    }
+
+    select, button {
+      padding: 14px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+    }
+
+    button {
+      background: #d4af37;
+      border: none;
+      cursor: pointer;
+    }
+
+    #reader {
+      width: 100%;
+      max-width: 400px;
+      margin: 20px auto;
+    }
+
+    #resultado {
+      margin-top: 20px;
+      font-size: 18px;
+      overflow-wrap: anywhere;
+    }
+  </style>
 </head>
+
 <body>
+
   <h1>CELEH 2026</h1>
   <h2>Control de acceso</h2>
-  <p>Página de prueba del escáner QR.</p>
+
+  <p>Selecciona tu punto de acceso:</p>
+
+  <select id="acceso">
+    <option value="Acceso 1">Acceso 1</option>
+    <option value="Acceso 2">Acceso 2</option>
+    <option value="Acceso 3">Acceso 3</option>
+    <option value="Acceso 4">Acceso 4</option>
+  </select>
+
+  <br>
+
+  <button id="iniciar" onclick="iniciarEscaner()">
+    Iniciar escáner
+  </button>
+
+  <div id="reader"></div>
+
+  <div id="resultado">
+    Esperando código QR...
+  </div>
+
+  <script>
+    let escaner = null;
+    let ocupado = false;
+
+    function mostrar(mensaje) {
+      document.getElementById("resultado").textContent = mensaje;
+    }
+
+    async function iniciarEscaner() {
+      const boton = document.getElementById("iniciar");
+      boton.disabled = true;
+
+      try {
+        if (!window.Html5Qrcode) {
+          throw new Error("No se pudo cargar la biblioteca QR.");
+        }
+
+        escaner = new Html5Qrcode("reader");
+
+        await escaner.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 }
+          },
+          codigoDetectado,
+          () => {}
+        );
+
+        mostrar("Cámara activa. Escanea un código QR.");
+
+      } catch (error) {
+        mostrar("Error al iniciar la cámara: " + error);
+        boton.disabled = false;
+      }
+    }
+
+    function codigoDetectado(codigo) {
+      if (ocupado) return;
+
+      ocupado = true;
+
+      const folio = codigo.trim().toUpperCase();
+      const acceso = document.getElementById("acceso").value;
+
+      mostrar(
+        "QR detectado: " + folio +
+        " | Punto seleccionado: " + acceso +
+        " | MODO PRUEBA: entrada no registrada."
+      );
+
+      setTimeout(() => {
+        ocupado = false;
+      }, 3000);
+    }
+  </script>
+
 </body>
 </html>
