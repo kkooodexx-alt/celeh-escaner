@@ -78,6 +78,31 @@
   <script>
     let escaner = null;
     let ocupado = false;
+    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbzbx33iYKEHnb9VeoMB6MfBRdrCKmUhsEB3LTKi-2yO30euHWSp_fki9l_B4j3EVGSF/exec";
+
+async function probarConexionCELEH() {
+  mostrar("Probando conexión con CELEH...");
+
+  try {
+    await fetch(URL_APPS_SCRIPT, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain"
+      },
+      body: JSON.stringify({
+        accion: "prueba"
+      })
+    });
+
+    mostrar(
+      "Solicitud enviada. Pendiente verificar recepción en Apps Script."
+    );
+
+  } catch (error) {
+    mostrar("No se pudo enviar la solicitud: " + error.message);
+  }
+}
 
     function mostrar(mensaje) {
       document.getElementById("resultado").textContent = mensaje;
